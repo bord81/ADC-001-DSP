@@ -20,7 +20,7 @@ INCLUDES := $(addprefix $(INCLUDEDIR)/, prussdrv.h pru_types.h __prussdrv.h prus
 # PRU code
 DEVICE=am335x
 PRU_CC := clpru
-PRU_CC_FLAGS := --silicon_version=3 -I./include -I/usr/include/arm-linux-gnueabihf -D$(DEVICE)
+PRU_CC_FLAGS := --silicon_version=3 -I/usr/share/ti/cgt-pru/include -I./include -I/usr/include/arm-linux-gnueabihf -i/usr/share/ti/cgt-pru/lib -D$(DEVICE)
 PRU_LINKER_SCRIPT := AM335x_PRU.cmd
 PRU_INCLUDES := resource_table_empty.h pru_ctrl.h pru_intc.h pru_cfg.h pru_spi.h
 
