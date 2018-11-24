@@ -1,1 +1,4 @@
 This repo is about playing around with ADC-001 A/D cape using Beaglebone Black Rev C.
+
+Installation tip: the correct way to disable HDMI is to uncomment the following line in /boot/uEnv.txt:
+disable_uboot_overlay_video=1
