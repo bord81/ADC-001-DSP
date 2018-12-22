@@ -2,5 +2,13 @@ Originally forked from github.com/brorson/ADC-001_basic_code
 
 This repo is about playing around with ADC-001 A/D cape using Beaglebone Black Rev C.
 
+'make' will create three executables of interest:
+
+main.o - original tests of ADC cape
+dsp_examples - program to record and analyze audio samples
+dsp_examples_test - helper tests to keep dsp_examples in order (using https://github.com/onqtam/doctest)
+
+More functionality and filters will be added soon!
+
 Installation tip: the correct way to disable HDMI is to uncomment the following line in /boot/uEnv.txt:
 disable_uboot_overlay_video=1
