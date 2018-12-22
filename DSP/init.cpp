@@ -42,7 +42,6 @@ static Init init_main;
 
 TEST_CASE("DSP test. Init::start_adc") {
     CHECK(test_adc_config == 0);
-    CHECK(test_adc_samprate == 0);
     CHECK(test_adc_chan1 == 0);
 
     init_main.start_adc();

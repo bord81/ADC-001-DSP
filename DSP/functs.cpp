@@ -20,9 +20,7 @@ static const char *load_f = "Enter filename to load (max 20 chars): \n";
 static const char *save_f = "Enter filename to save (max 20 chars): \n";
 
 static inline void display_algos();
-
 static inline void display_main();
-
 static inline void read_volts(int x, Init & init);
 
 static inline void enter_fname(const char *fname, FILE *h_stream);
@@ -42,8 +40,10 @@ void MicInput::exec(int x) {
 
 void LoadFile::exec(int x) {
     (void) x;
-    enter_fname(save_f, h_stream);
+    while (1) {
+    enter_fname(load_f, h_stream);
     data_file = fopen(file_name, "r");
+    if (data_file !=0) {
     int s_hi = fgetc(data_file);
     int s_lo = fgetc(data_file);
     volts_size = s_hi << 8;
@@ -51,6 +51,10 @@ void LoadFile::exec(int x) {
     fread(volts, sizeof(float), volts_size, data_file);
     fflush(data_file);
     fclose(data_file);
+    display_algos();
+    break;
+    }
+    }
 }
 
 void ExitFromProg::exec(int x) {
@@ -108,11 +112,15 @@ void ToFile::exec(int x) {
     int s_hi = volts_size >> 8;
     int s_lo = volts_size;
     data_file = fopen(file_name, "w");
+    if(data_file == 0) {
+	    perror("Following error occured: ");
+    } else {
     fputc(s_hi, data_file);
     fputc(s_lo, data_file);
     fwrite(volts, sizeof(float), volts_size, data_file);
     fflush(data_file);
     fclose(data_file);
+    }
     display_main();
 }
 
@@ -137,7 +145,8 @@ void MeanAndStdDev::exec(int x) {
     double elapsed_secs = double(end - begin);
     printf("Mean: %f\n", mean);
     printf("Standard deviation: %f\n", stddev);
-    printf("Elapsed time(standard formula): %f", elapsed_secs);
+    printf("Elapsed time(standard formula): %f\n", elapsed_secs);
+    printf("\n");
     //mean and standard deviation with running stats
     float sum = 0.0;
     float sumsqrs = 0.0;
@@ -150,12 +159,13 @@ void MeanAndStdDev::exec(int x) {
         mean = sum / i;
         var = (sumsqrs - (pow(sum, 2.0) / i)) / (i - 1);
         stddev = sqrt(var);
+    }
         end = clock();
         elapsed_secs = double(end - begin);
-        printf("%d: mean: %f\n", i, mean);
-        printf("%d: standard deviation: %f\n", i, stddev);
-        printf("Elapsed time(running stats): %f", elapsed_secs);
-    }
+        printf("Running stats mean: %f\n", mean);
+        printf("Running stats standard deviation: %f\n", stddev);
+        printf("Elapsed time(running stats): %f\n", elapsed_secs);
+    printf("\n");
     display_main();
 }
 
@@ -173,11 +183,11 @@ static inline void display_algos() {
 }
 
 static inline void display_main() {
-    printf("'1' analyze data from microphone\n");
-    printf("'2' record a sample\n");
-    printf("'3' load record & analyze\n");
-    printf("'4' change sample rate\n");
-    printf("'5' exit\n");
+   printf("'1' analyze data from microphone\n");
+   printf("'2' record a sample\n");
+   printf("'3' load record & analyze\n");
+   printf("'4' change sample rate\n");
+   printf("'5' exit\n");
 }
 
 static inline void read_volts(int x, Init &init) {
@@ -206,7 +216,15 @@ static inline void enter_fname(const char *fname, FILE* h_stream) {
     for (;;) {
         printf(fname);
         fgets(file_name, 20, h_stream);
-        if (strlen(file_name) > 0) {
+        if ((strlen(file_name) > 2) && (strchr(file_name, 0x20) == nullptr)) {
+	char* lf = strchr(file_name, 0xA);
+	char* cr = strchr(file_name, 0xD);
+	if (lf != nullptr) {
+		*lf = '\0';
+		}
+	if (cr != nullptr) {
+		*cr = '\0';
+		}
             break;
         }
     }
@@ -215,9 +233,6 @@ static inline void enter_fname(const char *fname, FILE* h_stream) {
 #ifdef DSP_TEST
 
 static SetSampRate setSampRate;
-static FILE* mem_file;
-static ToFile to_file(mem_file);
-static LoadFile load_file(mem_file);
 static char* test_f = "test.dat\n";
 static float volts_test[12288];
 
@@ -232,18 +247,25 @@ TEST_CASE("DSP test. SetSampRate") {
 
 TEST_CASE("DSP test. Record and load file") {
   bool test_ok = true;
-  mem_file = fmemopen(test_f, strlen(test_f), "r");
+FILE* mem_file = fmemopen(test_f, strlen(test_f), "r");
+ToFile to_file(mem_file);
+LoadFile load_file(mem_file);
   to_file.exec(512);
-  memcpy(volts_test, volts, 512);
+  memcpy(volts_test, volts, 512 * sizeof(float));
+rewind(mem_file);
   load_file.exec(0);
   for (int i = 0; i < 512; i++) {
     if (volts_test[i] != volts[i]) {
+	    printf("512. mismatch at %d, test: %f real %f\n", i, volts_test[i], volts[i]);
       test_ok = false;
     }
   }
   CHECK(test_ok == true);
+  test_ok = true;
+rewind(mem_file);
   to_file.exec(2048);
-  memcpy(volts_test, volts, 2048);
+  memcpy(volts_test, volts, 2048 * sizeof(float));
+rewind(mem_file);
   load_file.exec(0);
   for (int i = 0; i < 2048; i++) {
     if (volts_test[i] != volts[i]) {
@@ -251,8 +273,11 @@ TEST_CASE("DSP test. Record and load file") {
     }
   }
   CHECK(test_ok == true);
+  test_ok = true;
+rewind(mem_file);
   to_file.exec(12288);
-  memcpy(volts_test, volts, 12288);
+  memcpy(volts_test, volts, 12288 * sizeof(float));
+rewind(mem_file);
   load_file.exec(0);
   for (int i = 0; i < 12288; i++) {
     if (volts_test[i] != volts[i]) {

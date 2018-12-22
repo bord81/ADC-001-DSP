@@ -30,7 +30,7 @@ static const State_Entry main_menu_entries[] =
 	{ 1, '4', 11, &to_array_and_run, 4096},
 	{ 1, '5', 11, &to_array_and_run, 8192},
 	{ 1, '6', 11, &to_array_and_run, 12288},
-	{ 1, '7', 1, &main_menu, 0},
+	{ 1, '7', 0, &main_menu, 0},
 	{ 2, '1', 0, &to_file, 512},
 	{ 2, '2', 0, &to_file, 1024},
 	{ 2, '3', 0, &to_file, 2048},

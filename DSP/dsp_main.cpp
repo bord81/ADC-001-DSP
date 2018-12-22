@@ -14,6 +14,11 @@ int main(int argc, char *argv[]) {
 		init_main.stop_adc(1);
 	}
 	init_main.start_adc();
+	printf("\n");
+	printf("===================================================\n");
+	printf("Playing around with basics of DSP on BBB. Have fun!\n");
+	printf("===================================================\n");
+	printf("\n");
 	execute_State_Machine(&mm);
 	return 0;
 }
