@@ -41,10 +41,15 @@ PRU_HEXPRU_SCRIPT := bin.cmd
 #----------------------------------------------------
 # DSP code
 DSP_CC := g++
-DSP_CFLAGS := -O3 -mfpu=vfpv3 -mfloat-abi=hard -march=armv7 -I./include -I./DSP
+DSP_CFLAGS := -O3 -mfpu=vfpv3 -mfloat-abi=hard -march=armv7 -I./include -I./DSP -I./gnuplot_i/src
 DSP_TEST_CFLAGS := -I./DSP -DDSP_TEST -Wno-write-strings
-DSP_OBJS := dsp_main.o init.o functs.o sm.o tables.o prussdrv.o adcdriver_host.o spidriver_host.o
+DSP_OBJS := dsp_main.o init.o functs.o sm.o tables.o plot.o gnuplot_i.o prussdrv.o adcdriver_host.o spidriver_host.o
 DSP_TEST_OBJS := dsp_main_test.o init_test.o functs_test.o adcdriver_host_mock.o
+
+#----------------------------------------------------
+# gnuplot_i code
+
+GPI_CFLAGS 	= -O3 -I./src
 
 #=================================================
 all: main pru0.bin pru1.bin dsp ADC_001-00A0.dtbo
@@ -74,7 +79,10 @@ prussdrv.o: prussdrv.c # $(DEPS)
 # Link the ARM objects
 main: $(OBJS) 
 	echo "--> Linking ARM stuff...."
-	$(CC) $(CFLAGS) $^ $(LIBLOCS) $(LDFLAGS) -o $@ 
+	$(CC) $(CFLAGS) $^ $(LIBLOCS) $(LDFLAGS) -o $@
+
+gnuplot_i.o: gnuplot_i/src/gnuplot_i.c gnuplot_i/src/gnuplot_i.h
+	$(CC) $(GPI_CFLAGS) -c -o gnuplot_i.o gnuplot_i/src/gnuplot_i.c
 
 dsp_main.o:
 	echo "--> Building DSP...."
@@ -82,6 +90,7 @@ dsp_main.o:
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/init.cpp -o init.o
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/functs.cpp -o functs.o
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/sm.cpp -o sm.o
+	$(DSP_CC) $(DSP_CFLAGS) -c DSP/plot.cpp -o plot.o
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/tables.cpp -o tables.o
 dsp_test.o:
 	echo "--> Building DSP tests...."
@@ -90,7 +99,7 @@ dsp_test.o:
 	$(DSP_CC) $(DSP_TEST_CFLAGS) -c DSP/functs.cpp -o functs_test.o
 	$(DSP_CC) $(DSP_TEST_CFLAGS) -c DSP/adcdriver_host_mock.cpp -o adcdriver_host_mock.o
 	$(DSP_CC) $(DSP_TEST_OBJS) -o dsp_examples_test
-dsp: dsp_main.o dsp_test.o
+dsp: gnuplot_i.o dsp_main.o dsp_test.o
 	echo "--> Linking DSP...."
 	$(DSP_CC) $(DSP_CFLAGS) $(DSP_OBJS) -o dsp_examples 
 $(OBJS): $(INCLUDES)
