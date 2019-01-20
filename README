@@ -12,7 +12,7 @@ More functionality and filters will be added soon!
 
 Installation tips: 
 
-1. the correct way to disable HDMI is to uncomment the following line in /boot/uEnv.txt:
+1. the correct way to disable HDMI is to uncomment the following line in /boot/uEnv.txt
 disable_uboot_overlay_video=1
 
 2. add following line to /etc/environment to enable correct work of gnuplot
