@@ -23,12 +23,12 @@ public:
 
 class LoadFile : public Funct {
 public:
-    LoadFile(FILE* f) : h_stream(f) {}
+    LoadFile(FILE *f) : h_stream(f) {}
 
     virtual void exec(int x);
 
 private:
-    FILE* h_stream;
+    FILE *h_stream;
 };
 
 /* Exit from program */
@@ -43,6 +43,7 @@ private:
 class ToArrayAndRun : public Funct {
 public:
     virtual void exec(int x);
+
 private:
     Init init;
 };
@@ -69,12 +70,12 @@ public:
 
 class ToFile : public Funct {
 public:
-    ToFile(FILE* f) : h_stream(f) {}
+    ToFile(FILE *f) : h_stream(f) {}
 
     virtual void exec(int x);
 
 private:
-    FILE* h_stream;
+    FILE *h_stream;
     Init init;
 };
 
@@ -82,5 +83,14 @@ class MeanAndStdDev : public Funct {
 public:
     virtual void exec(int x);
 };
+
+#ifndef DSP_TEST
+
+class HistMeanAndStdDev : public Funct {
+public:
+    virtual void exec(int x);
+};
+
+#endif
 
 #endif // FUNCT_H

@@ -4,7 +4,9 @@
 class Init {
 public:
     Init();
+
     void start_adc();
+
     void stop_adc(int status);
 
 private:

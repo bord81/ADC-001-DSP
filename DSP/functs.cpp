@@ -3,6 +3,12 @@
 #include "dsp.h"
 #include "funct.h"
 
+#ifndef DSP_TEST
+
+#include "plot.h"
+
+#endif
+
 #ifdef DSP_TEST
 #include <cstring>
 #include "doctest.h"
@@ -20,8 +26,10 @@ static const char *load_f = "Enter filename to load (max 20 chars): \n";
 static const char *save_f = "Enter filename to save (max 20 chars): \n";
 
 static inline void display_algos();
+
 static inline void display_main();
-static inline void read_volts(int x, Init & init);
+
+static inline void read_volts(int x, Init &init);
 
 static inline void enter_fname(const char *fname, FILE *h_stream);
 
@@ -41,19 +49,19 @@ void MicInput::exec(int x) {
 void LoadFile::exec(int x) {
     (void) x;
     while (1) {
-    enter_fname(load_f, h_stream);
-    data_file = fopen(file_name, "r");
-    if (data_file !=0) {
-    int s_hi = fgetc(data_file);
-    int s_lo = fgetc(data_file);
-    volts_size = s_hi << 8;
-    volts_size |= s_lo;
-    fread(volts, sizeof(float), volts_size, data_file);
-    fflush(data_file);
-    fclose(data_file);
-    display_algos();
-    break;
-    }
+        enter_fname(load_f, h_stream);
+        data_file = fopen(file_name, "r");
+        if (data_file != 0) {
+            int s_hi = fgetc(data_file);
+            int s_lo = fgetc(data_file);
+            volts_size = s_hi << 8;
+            volts_size |= s_lo;
+            fread(volts, sizeof(float), volts_size, data_file);
+            fflush(data_file);
+            fclose(data_file);
+            display_algos();
+            break;
+        }
     }
 }
 
@@ -112,14 +120,14 @@ void ToFile::exec(int x) {
     int s_hi = volts_size >> 8;
     int s_lo = volts_size;
     data_file = fopen(file_name, "w");
-    if(data_file == 0) {
-	    perror("Following error occured: ");
+    if (data_file == 0) {
+        perror("Following error occured: ");
     } else {
-    fputc(s_hi, data_file);
-    fputc(s_lo, data_file);
-    fwrite(volts, sizeof(float), volts_size, data_file);
-    fflush(data_file);
-    fclose(data_file);
+        fputc(s_hi, data_file);
+        fputc(s_lo, data_file);
+        fwrite(volts, sizeof(float), volts_size, data_file);
+        fflush(data_file);
+        fclose(data_file);
     }
     display_main();
 }
@@ -160,34 +168,54 @@ void MeanAndStdDev::exec(int x) {
         var = (sumsqrs - (pow(sum, 2.0) / i)) / (i - 1);
         stddev = sqrt(var);
     }
-        end = clock();
-        elapsed_secs = double(end - begin);
-        printf("Running stats mean: %f\n", mean);
-        printf("Running stats standard deviation: %f\n", stddev);
-        printf("Elapsed time(running stats): %f\n", elapsed_secs);
+    end = clock();
+    elapsed_secs = double(end - begin);
+    printf("Running stats mean: %f\n", mean);
+    printf("Running stats standard deviation: %f\n", stddev);
+    printf("Elapsed time(running stats): %f\n", elapsed_secs);
     printf("\n");
     display_main();
 }
 
+#ifndef DSP_TEST
 
-/* TODO: Implement HistMeanAndStdDev
-class HistMeanAndStdDev : public Funct 
-{
-public:
-  virtual void exec(int x) {  }
-}; */
+void HistMeanAndStdDev::exec(int x) {
+    float mean = 0.0;
+    float var = 0.0;
+    float stddev = 0.0;
+    float sum = 0.0;
+    float sumsqrs = 0.0;
+    Plot plot;
+    for (int i = 0, j = 0; i < volts_size; i++) {
+        sum += volts[i];
+        sumsqrs += pow(volts[i], 2.0);
+        mean = sum / i;
+        var = (sumsqrs - (pow(sum, 2.0) / i)) / (i - 1);
+        stddev = sqrt(var);
+    }
+    printf("Running stats mean: %f\n", mean);
+    printf("Running stats standard deviation: %f\n", stddev);
+    plot.init_p();
+    plot.histogram(volts, volts_size);
+    plot.close_p();
+    printf("\n");
+    display_main();
+}
+
+#endif
 
 static inline void display_algos() {
     printf("'1' Mean and standard deviation\n");
+    printf("'2' Histogram, mean and std deviation\n");
     printf("'0' back to main menu\n");
 }
 
 static inline void display_main() {
-   printf("'1' analyze data from microphone\n");
-   printf("'2' record a sample\n");
-   printf("'3' load record & analyze\n");
-   printf("'4' change sample rate\n");
-   printf("'5' exit\n");
+    printf("'1' analyze data from microphone\n");
+    printf("'2' record a sample\n");
+    printf("'3' load record & analyze\n");
+    printf("'4' change sample rate\n");
+    printf("'5' exit\n");
 }
 
 static inline void read_volts(int x, Init &init) {
@@ -211,20 +239,20 @@ static inline void read_volts(int x, Init &init) {
     volts_size = x;
 }
 
-static inline void enter_fname(const char *fname, FILE* h_stream) {
+static inline void enter_fname(const char *fname, FILE *h_stream) {
     memset(file_name, 0, sizeof(file_name));
     for (;;) {
         printf(fname);
         fgets(file_name, 20, h_stream);
         if ((strlen(file_name) > 2) && (strchr(file_name, 0x20) == nullptr)) {
-	char* lf = strchr(file_name, 0xA);
-	char* cr = strchr(file_name, 0xD);
-	if (lf != nullptr) {
-		*lf = '\0';
-		}
-	if (cr != nullptr) {
-		*cr = '\0';
-		}
+            char *lf = strchr(file_name, 0xA);
+            char *cr = strchr(file_name, 0xD);
+            if (lf != nullptr) {
+                *lf = '\0';
+            }
+            if (cr != nullptr) {
+                *cr = '\0';
+            }
             break;
         }
     }
@@ -256,7 +284,7 @@ rewind(mem_file);
   load_file.exec(0);
   for (int i = 0; i < 512; i++) {
     if (volts_test[i] != volts[i]) {
-	    printf("512. mismatch at %d, test: %f real %f\n", i, volts_test[i], volts[i]);
+        printf("512. mismatch at %d, test: %f real %f\n", i, volts_test[i], volts[i]);
       test_ok = false;
     }
   }

@@ -10,8 +10,8 @@
 
 #ifndef DSP_TEST
 extern "C" {
-	#include "spidriver_host.h"
-	#include "adcdriver_host.h"
+#include "spidriver_host.h"
+#include "adcdriver_host.h"
 }
 #else
 #include "adcdriver_host_mock.h"
