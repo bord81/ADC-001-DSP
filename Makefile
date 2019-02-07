@@ -42,9 +42,7 @@ PRU_HEXPRU_SCRIPT := bin.cmd
 # DSP code
 DSP_CC := g++
 DSP_CFLAGS := -O3 -mfpu=vfpv3 -mfloat-abi=hard -march=armv7 -I./include -I./DSP -I./gnuplot_i/src
-DSP_TEST_CFLAGS := -I./DSP -DDSP_TEST -Wno-write-strings
-DSP_OBJS := dsp_main.o init.o functs.o sm.o tables.o plot.o gnuplot_i.o prussdrv.o adcdriver_host.o spidriver_host.o
-DSP_TEST_OBJS := dsp_main_test.o init_test.o functs_test.o adcdriver_host_mock.o
+DSP_OBJS := dsp_main.o init.o functs.o sm.o tables.o plot.o gnuplot_i.o wav_h_gen.o prussdrv.o adcdriver_host.o spidriver_host.o
 
 #----------------------------------------------------
 # gnuplot_i code
@@ -56,7 +54,9 @@ all: main pru0.bin pru1.bin dsp ADC_001-00A0.dtbo
 
 bins: main pru0.bin dsp
 
-.PHONY: dsp
+dsp-only: dsp
+
+.PHONY: dsp dsp_main.o
 
 #--------------------------------
 # Compile ARM sources for host.
@@ -92,14 +92,9 @@ dsp_main.o:
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/sm.cpp -o sm.o
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/plot.cpp -o plot.o
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/tables.cpp -o tables.o
-dsp_test.o:
-	echo "--> Building DSP tests...."
-	$(DSP_CC) $(DSP_TEST_CFLAGS) -c DSP/dsp_main.cpp -o dsp_main_test.o
-	$(DSP_CC) $(DSP_TEST_CFLAGS) -c DSP/init.cpp -o init_test.o
-	$(DSP_CC) $(DSP_TEST_CFLAGS) -c DSP/functs.cpp -o functs_test.o
-	$(DSP_CC) $(DSP_TEST_CFLAGS) -c DSP/adcdriver_host_mock.cpp -o adcdriver_host_mock.o
-	$(DSP_CC) $(DSP_TEST_OBJS) -o dsp_examples_test
-dsp: gnuplot_i.o dsp_main.o dsp_test.o
+	$(DSP_CC) $(DSP_CFLAGS) -c DSP/wav_h_gen.cpp -o wav_h_gen.o
+
+dsp: gnuplot_i.o dsp_main.o
 	echo "--> Linking DSP...."
 	$(DSP_CC) $(DSP_CFLAGS) $(DSP_OBJS) -o dsp_examples 
 $(OBJS): $(INCLUDES)

@@ -18,23 +18,18 @@ typedef Funct *FunctPtr;
 
 class MicInput : public Funct {
 public:
-    virtual void exec(int x);
+    void exec(int x) override;
 };
 
 class LoadFile : public Funct {
 public:
-    LoadFile(FILE *f) : h_stream(f) {}
-
-    virtual void exec(int x);
-
-private:
-    FILE *h_stream;
+    void exec(int x) override;
 };
 
 /* Exit from program */
 class ExitFromProg : public Funct {
 public:
-    virtual void exec(int x);
+    void exec(int x) override;
 
 private:
     Init init;
@@ -42,7 +37,7 @@ private:
 
 class ToArrayAndRun : public Funct {
 public:
-    virtual void exec(int x);
+    void exec(int x) override;
 
 private:
     Init init;
@@ -50,45 +45,47 @@ private:
 
 class ChooseSampRate1 : public Funct {
 public:
-    virtual void exec(int x);
+    void exec(int x) override;
 };
 
 class ChooseSampRate2 : public Funct {
 public:
-    virtual void exec(int x);
+    void exec(int x) override;
 };
 
 class SetSampRate : public Funct {
 public:
-    virtual void exec(int x);
+    void exec(int x) override;
 };
 
 class MainMenu : public Funct {
 public:
-    virtual void exec(int x);
+    void exec(int x) override;
 };
 
 class ToFile : public Funct {
 public:
-    ToFile(FILE *f) : h_stream(f) {}
-
-    virtual void exec(int x);
+    void exec(int x) override;
 
 private:
-    FILE *h_stream;
     Init init;
 };
 
 class MeanAndStdDev : public Funct {
 public:
-    virtual void exec(int x);
+    void exec(int x) override;
 };
 
 #ifndef DSP_TEST
 
 class HistMeanAndStdDev : public Funct {
 public:
-    virtual void exec(int x);
+    void exec(int x) override;
+};
+
+class ConvertToWav : public Funct {
+public:
+    void exec(int x) override;
 };
 
 #endif

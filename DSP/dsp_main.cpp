@@ -1,8 +1,3 @@
-#ifdef DSP_TEST
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest.h"
-#else
-
 #include <unistd.h>
 #include "dsp.h"
 #include "funct.h"
@@ -23,5 +18,3 @@ int main(int argc, char *argv[]) {
     execute_State_Machine(&mm);
     return 0;
 }
-
-#endif

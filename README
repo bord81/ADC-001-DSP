@@ -6,7 +6,6 @@ This repo is about playing around with ADC-001 A/D cape using Beaglebone Black R
 
 main.o - original tests of ADC cape
 dsp_examples - program to record and analyze audio samples
-dsp_examples_test - helper tests to keep dsp_examples in order (using https://github.com/onqtam/doctest)
 
 More functionality and filters will be added soon!
 

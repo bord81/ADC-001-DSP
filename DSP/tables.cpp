@@ -1,20 +1,19 @@
-#ifndef DSP_TEST
-
 #include <cstdio>
 
 #include "dsp.h"
 
 static MicInput mic_input;
-static LoadFile load_file(stdin);
+static LoadFile load_file;
 static ExitFromProg exit_from_prog;
 static ToArrayAndRun to_array_and_run;
 static ChooseSampRate1 ch_samp_rate1;
 static ChooseSampRate2 ch_samp_rate2;
 static SetSampRate set_samp_rate;
 static MainMenu main_menu;
-static ToFile to_file(stdin);
+static ToFile to_file;
 static MeanAndStdDev mean_and_std_dev;
 static HistMeanAndStdDev hist_mean_and_std_dev;
+static ConvertToWav convert_to_wav;
 
 /* Main state machine table */
 static const State_Entry main_menu_entries[] =
@@ -23,7 +22,8 @@ static const State_Entry main_menu_entries[] =
                 {0,  '2', 2,  &mic_input,             0},
                 {0,  '3', 11, &load_file,             0},
                 {0,  '4', 3,  &ch_samp_rate1,         0},
-                {0,  '5', 4,  &exit_from_prog,        0},
+                {0,  '5', 6,  &convert_to_wav,         0},
+                {0,  '6', 4,  &exit_from_prog,        0},
                 {1,  '1', 11, &to_array_and_run,      512},
                 {1,  '2', 11, &to_array_and_run,      1024},
                 {1,  '3', 11, &to_array_and_run,      2048},
@@ -58,16 +58,15 @@ static const State_Entry main_menu_entries[] =
                 {5,  '3', 0,  &set_samp_rate, SAMP_RATE_50},
                 {5,  'p', 3,  &ch_samp_rate1,         0},
                 {5,  '0', 0,  &main_menu,             0},
+                {6,  '0', 0,  &main_menu,             0},
         };
 
 static const unsigned int TABLE_SIZE = sizeof(main_menu_entries) / sizeof(main_menu_entries[0]);
 
-State_Entry const *table_begin(void) {
+State_Entry const *table_begin() {
     return &main_menu_entries[0];
 }
 
-State_Entry const *table_end(void) {
+State_Entry const *table_end() {
     return &main_menu_entries[TABLE_SIZE];
 }
-
-#endif
