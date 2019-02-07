@@ -218,7 +218,6 @@ void ConvertToWav::exec(int x) {
         fwrite(header->sub_chunk_2_id, 4, 1, data_file);
         fwrite(&header->sub_chunk_2_size, 4, 1, data_file);
         fwrite(out_volts, sizeof(int16_t), static_cast<size_t>(volts_size), data_file);
-    //    fwrite(volts, sizeof(float), static_cast<size_t>(volts_size), data_file);
         fflush(data_file);
         fclose(data_file);
     }
