@@ -1,9 +1,6 @@
 #ifndef FUNCT_H
 #define FUNCT_H
 
-#include <cstdio>
-#include "init.h"
-
 class Funct {
 public:
     virtual void exec(int x) = 0;
@@ -21,6 +18,11 @@ public:
     void exec(int x) override;
 };
 
+class DumpConv : public Funct {
+public:
+    void exec(int x) override;
+};
+
 class LoadFile : public Funct {
 public:
     void exec(int x) override;
@@ -30,17 +32,6 @@ public:
 class ExitFromProg : public Funct {
 public:
     void exec(int x) override;
-
-private:
-    Init init;
-};
-
-class ToArrayAndRun : public Funct {
-public:
-    void exec(int x) override;
-
-private:
-    Init init;
 };
 
 class ChooseSampRate1 : public Funct {
@@ -53,7 +44,7 @@ public:
     void exec(int x) override;
 };
 
-class SetSampRate : public Funct {
+class SetSampRateAndRun : public Funct {
 public:
     void exec(int x) override;
 };
@@ -63,13 +54,11 @@ public:
     void exec(int x) override;
 };
 
-class ToFile : public Funct {
+class DispAlgos : public Funct {
 public:
     void exec(int x) override;
-
-private:
-    Init init;
 };
+
 
 class MeanAndStdDev : public Funct {
 public:
@@ -83,7 +72,22 @@ public:
     void exec(int x) override;
 };
 
-class ConvertToWav : public Funct {
+class ConvInputSide : public Funct {
+public:
+    void exec(int x) override;
+};
+
+class ConvOutputSide : public Funct {
+public:
+    void exec(int x) override;
+};
+
+class Amplify : public Funct {
+public:
+    void exec(int x) override;
+};
+
+class Attenuate : public Funct {
 public:
     void exec(int x) override;
 };

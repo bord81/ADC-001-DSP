@@ -1,20 +1,21 @@
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
-#include "dsp.h"
-#include "funct.h"
+#include "table.h"
+#include "services.h"
 
 int main(int argc, char *argv[]) {
-    Init init_main;
-    MainMenu mm;
     if (getuid() != 0) {
         printf("You must run this program as root. Exiting.\n");
-        init_main.stop_adc(1);
+        exit(1);
     }
-    init_main.start_adc();
+    services::start_adc();
     printf("\n");
     printf("===================================================\n");
     printf("Playing around with basics of DSP on BBB. Have fun!\n");
     printf("===================================================\n");
     printf("\n");
+    MainMenu mm;
     execute_State_Machine(&mm);
     return 0;
 }

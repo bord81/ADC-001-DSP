@@ -1,4 +1,5 @@
 #ifndef DSP_TEST
+#include <cstdio>
 
 #include "plot.h"
 

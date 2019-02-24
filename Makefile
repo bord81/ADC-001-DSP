@@ -42,7 +42,7 @@ PRU_HEXPRU_SCRIPT := bin.cmd
 # DSP code
 DSP_CC := g++
 DSP_CFLAGS := -O3 -mfpu=vfpv3 -mfloat-abi=hard -march=armv7 -I./include -I./DSP -I./gnuplot_i/src
-DSP_OBJS := dsp_main.o init.o functs.o sm.o tables.o plot.o gnuplot_i.o wav_h_gen.o prussdrv.o adcdriver_host.o spidriver_host.o
+DSP_OBJS := dsp_main.o functs.o tables.o plot.o gnuplot_i.o wav_h_gen.o services.o algos.o mem_man.o prussdrv.o adcdriver_host.o spidriver_host.o
 
 #----------------------------------------------------
 # gnuplot_i code
@@ -87,12 +87,13 @@ gnuplot_i.o: gnuplot_i/src/gnuplot_i.c gnuplot_i/src/gnuplot_i.h
 dsp_main.o:
 	echo "--> Building DSP...."
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/dsp_main.cpp -o dsp_main.o
-	$(DSP_CC) $(DSP_CFLAGS) -c DSP/init.cpp -o init.o
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/functs.cpp -o functs.o
-	$(DSP_CC) $(DSP_CFLAGS) -c DSP/sm.cpp -o sm.o
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/plot.cpp -o plot.o
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/tables.cpp -o tables.o
 	$(DSP_CC) $(DSP_CFLAGS) -c DSP/wav_h_gen.cpp -o wav_h_gen.o
+	$(DSP_CC) $(DSP_CFLAGS) -c DSP/services.cpp -o services.o
+	$(DSP_CC) $(DSP_CFLAGS) -c DSP/algos.cpp -o algos.o
+	$(DSP_CC) $(DSP_CFLAGS) -c DSP/mem_man.cpp -o mem_man.o
 
 dsp: gnuplot_i.o dsp_main.o
 	echo "--> Linking DSP...."

@@ -7,8 +7,6 @@
 
 #include <memory>
 
-#include "dsp.h"
-
 struct wav_header {
     char chunk_id[4] = {'R', 'I', 'F', 'F'};
     char chunk_format[4] = {'W', 'A', 'V', 'E'};
@@ -22,20 +20,24 @@ struct wav_header {
 
     char sub_chunk_2_id[4] = {'d', 'a', 't', 'a'};
 
-    uint32_t sub_chunk_2_size;
-    uint32_t chunk_size;
-    uint32_t sample_rate;
-    uint32_t byte_rate;
+    uint32_t sub_chunk_2_size = 0;
+    uint32_t chunk_size = 0;
+    uint32_t sample_rate = 0;
+    uint32_t byte_rate = 0;
 };
 
 class wav_h_gen {
 public:
     wav_h_gen();
+    wav_h_gen(const wav_h_gen &w);
+    ~wav_h_gen();
 
-    std::shared_ptr<wav_header> get_wav_header(int samples_count, int sample_rate);
+    wav_header *get_wav_header(int samples_count, int sample_rate);
+
+    static int real_samp_rate(int sr_const);
 
 private:
-    std::shared_ptr<wav_header> header;
+    wav_header *header;
 };
 
 

@@ -1,64 +1,75 @@
 #include <cstdio>
+#include <cstdint>
 
-#include "dsp.h"
+extern "C" {
+#include "spidriver_host.h"
+#include "adcdriver_host.h"
+}
+
+#include "table.h"
+#include "services.h"
 
 static MicInput mic_input;
 static LoadFile load_file;
 static ExitFromProg exit_from_prog;
-static ToArrayAndRun to_array_and_run;
 static ChooseSampRate1 ch_samp_rate1;
 static ChooseSampRate2 ch_samp_rate2;
-static SetSampRate set_samp_rate;
+static SetSampRateAndRun set_samp_rate_run;
 static MainMenu main_menu;
-static ToFile to_file;
+static DispAlgos disp_algos;
 static MeanAndStdDev mean_and_std_dev;
 static HistMeanAndStdDev hist_mean_and_std_dev;
-static ConvertToWav convert_to_wav;
+static ConvInputSide conv_inp_side;
+static ConvOutputSide conv_out_side;
+static DumpConv dump_conv;
+static Amplify amplify;
+static Attenuate attenuate;
 
 /* Main state machine table */
 static const State_Entry main_menu_entries[] =
         {
-                {0,  '1', 1,  &mic_input,             0},
-                {0,  '2', 2,  &mic_input,             0},
-                {0,  '3', 11, &load_file,             0},
-                {0,  '4', 3,  &ch_samp_rate1,         0},
-                {0,  '5', 6,  &convert_to_wav,         0},
-                {0,  '6', 4,  &exit_from_prog,        0},
-                {1,  '1', 11, &to_array_and_run,      512},
-                {1,  '2', 11, &to_array_and_run,      1024},
-                {1,  '3', 11, &to_array_and_run,      2048},
-                {1,  '4', 11, &to_array_and_run,      4096},
-                {1,  '5', 11, &to_array_and_run,      8192},
-                {1,  '6', 11, &to_array_and_run,      12288},
-                {1,  '7', 0,  &main_menu,             0},
-                {2,  '1', 0,  &to_file,               512},
-                {2,  '2', 0,  &to_file,               1024},
-                {2,  '3', 0,  &to_file,               2048},
-                {2,  '4', 0,  &to_file,               4096},
-                {2,  '5', 0,  &to_file,               8192},
-                {2,  '6', 0,  &to_file,               12288},
-                {2,  '7', 0,  &main_menu,             0},
-                {11, '1', 0,  &mean_and_std_dev,      0},
-                {11, '2', 0,  &hist_mean_and_std_dev, 0},
-//	{ 11, 'n', 11, &load_next_algos, 0},
-                {11, '0', 0,  &main_menu,             0},
-                {3,  '1', 0,  &set_samp_rate, SAMP_RATE_31250},
-                {3,  '2', 0,  &set_samp_rate, SAMP_RATE_15625},
-                {3,  '3', 0,  &set_samp_rate, SAMP_RATE_10417},
-                {3,  '4', 0,  &set_samp_rate, SAMP_RATE_5208},
-                {3,  '5', 0,  &set_samp_rate, SAMP_RATE_2604},
-                {3,  '6', 0,  &set_samp_rate, SAMP_RATE_1008},
-                {3,  '7', 0,  &set_samp_rate, SAMP_RATE_504},
-                {3,  '8', 0,  &set_samp_rate, SAMP_RATE_400P6},
-                {3,  '9', 0,  &set_samp_rate, SAMP_RATE_200P3},
-                {3,  'n', 5,  &ch_samp_rate2,         0},
-                {3,  '0', 0,  &main_menu,             0},
-                {5,  '1', 0,  &set_samp_rate, SAMP_RATE_100P2},
-                {5,  '2', 0,  &set_samp_rate, SAMP_RATE_59P98},
-                {5,  '3', 0,  &set_samp_rate, SAMP_RATE_50},
-                {5,  'p', 3,  &ch_samp_rate1,         0},
-                {5,  '0', 0,  &main_menu,             0},
-                {6,  '0', 0,  &main_menu,             0},
+                {0, '1', 1, &mic_input,             0},
+                {0, '2', 0, &load_file,             MEM_SLOT_1},
+                {0, '3', 0, &load_file,             MEM_SLOT_2},
+                {0, '4', 5, &disp_algos,            0},
+                {0, '5', 6, &disp_algos,            0},
+                {0, '6', 0, &conv_inp_side,         0},
+                {0, '7', 0, &conv_out_side,         0},
+                {0, '8', 0, &dump_conv,             0},
+                {0, '9', 0, &exit_from_prog,        0},
+                {1, '1', 2, &ch_samp_rate1,         DURATION_1},
+                {1, '2', 2, &ch_samp_rate1,         DURATION_2},
+                {1, '3', 2, &ch_samp_rate1,         DURATION_5},
+                {1, '4', 2, &ch_samp_rate1,         DURATION_10},
+                {1, '5', 0, &main_menu,             0},
+                {2, '1', 0, &set_samp_rate_run, SAMP_RATE_31250},
+                {2, '2', 0, &set_samp_rate_run, SAMP_RATE_15625},
+                {2, '3', 0, &set_samp_rate_run, SAMP_RATE_10417},
+                {2, '4', 0, &set_samp_rate_run, SAMP_RATE_5208},
+                {2, '5', 0, &set_samp_rate_run, SAMP_RATE_2604},
+                {2, '6', 0, &set_samp_rate_run, SAMP_RATE_1008},
+                {2, '7', 0, &set_samp_rate_run, SAMP_RATE_504},
+                {2, '8', 0, &set_samp_rate_run, SAMP_RATE_400P6},
+                {2, '9', 0, &set_samp_rate_run, SAMP_RATE_200P3},
+                {2, 'n', 3, &ch_samp_rate2,         0},
+                {2, '0', 0, &main_menu,             0},
+                {3, '1', 0, &set_samp_rate_run, SAMP_RATE_100P2},
+                {3, '2', 0, &set_samp_rate_run, SAMP_RATE_59P98},
+                {3, '3', 0, &set_samp_rate_run, SAMP_RATE_50},
+                {3, 'p', 2, &ch_samp_rate1,         0},
+                {3, '0', 0, &main_menu,             0},
+                {5, '1', 0, &mean_and_std_dev,      MEM_SLOT_1},
+                {5, '2', 0, &hist_mean_and_std_dev, MEM_SLOT_1},
+                {5, '3', 0, &amplify,               MEM_SLOT_1},
+                {5, '4', 0, &attenuate,             MEM_SLOT_1},
+                {5, '0', 0, &main_menu,             0},
+                {6, '1', 0, &mean_and_std_dev,      MEM_SLOT_2},
+                {6, '2', 0, &hist_mean_and_std_dev, MEM_SLOT_2},
+                {6, '3', 0, &amplify,               MEM_SLOT_2},
+                {6, '4', 0, &attenuate,             MEM_SLOT_2},
+                {6, '0', 0, &main_menu,             0},
+
+
         };
 
 static const unsigned int TABLE_SIZE = sizeof(main_menu_entries) / sizeof(main_menu_entries[0]);
@@ -69,4 +80,29 @@ State_Entry const *table_begin() {
 
 State_Entry const *table_end() {
     return &main_menu_entries[TABLE_SIZE];
+}
+
+/* State machine taking care of screen workflows */
+void execute_State_Machine(FunctPtr fp) {
+    unsigned int current_state = 0;
+    int transition_letter = 0;
+    fp->exec(0);
+    while (true) {
+        transition_letter = getchar();
+        State_Entry const *p_entry = table_begin();
+        State_Entry const *const p_table_end = table_end();
+        bool state_found = false;
+        while ((!state_found) && (p_entry != p_table_end)) {
+            if (p_entry->current_state_id == current_state) {
+                if ((transition_letter < 0xFF && transition_letter > 0) &&
+                    (p_entry->transition_letter == (unsigned char) transition_letter)) {
+                    p_entry->action->exec(p_entry->parameter);
+                    current_state = p_entry->next_state_id;
+                    state_found = true;
+                    break;
+                }
+            }
+            ++p_entry;
+        }
+    }
 }
