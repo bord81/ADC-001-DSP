@@ -43,6 +43,10 @@ public:
 
     int choose_strength();
 
+    double choose_cutoff_freq(const char *prompt, int sampl_rate);
+
+    int choose_window_func(const char *prompt);
+
 private:
     void alloc_mem(MemoryData& slot, size_t size);
     bool check_mem(MemoryData& slot, const char *msg);

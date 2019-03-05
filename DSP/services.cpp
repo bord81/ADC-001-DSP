@@ -72,6 +72,33 @@ int services::choose_strength() {
     return ch;
 }
 
+double services::choose_cutoff_freq(const char *prompt, int sampl_rate) {
+    double ch = 0;
+    int nyquist_fr = get_real_samp_rate(sampl_rate) / 2;
+    int inp_fr = -1;
+    for (;;) {
+        printf(prompt, nyquist_fr);
+        scanf("%d", &inp_fr);
+        if (inp_fr >= 0 && inp_fr < nyquist_fr) {
+            break;
+        }
+    }
+    ch = (double) inp_fr / (double) (nyquist_fr * 2);
+    return ch;
+}
+
+int services::choose_window_func(const char *prompt) {
+    int w_func = 0;
+    for (;;) {
+        printf(prompt);
+        scanf("%d", &w_func);
+        if (w_func > 0 && w_func < 4) {
+            break;
+        }
+    }
+    return w_func;
+}
+
 void services::get_path(char *dest, size_t dest_size, const char *prefix, const char *name, const char *ext) {
     memset(dest, '\0', dest_size);
     strcpy(dest, prefix);
@@ -186,6 +213,10 @@ void services::display_algos() {
     printf("'2' Histogram, mean and std deviation\n");
     printf("'3' Amplify signal\n");
     printf("'4' Attenuate signal\n");
+    printf("'5' Low-pass filter\n");
+    printf("'6' High-pass filter\n");
+    printf("'7' Band-pass filter\n");
+    printf("'8' Band-stop filter\n");
     printf("'0' back to main menu\n");
 }
 

@@ -5,6 +5,7 @@
 #include "plot.h"
 #include "algos.h"
 
+
 void algos::mean_stddev(MemoryData &slot) {
     float mean = 0.0;
     float var = 0.0;
@@ -87,7 +88,7 @@ void algos::conv_inp_side(MemoryData &in_slot, MemoryData &resp_slot, MemoryData
 }
 
 void algos::conv_outp_side(MemoryData &in_slot, MemoryData &resp_slot, MemoryData &out_slot) {
-    if(mem_man::mem_alloc(out_slot, in_slot.volts_size + resp_slot.volts_size - 1)) {
+    if (mem_man::mem_alloc(out_slot, in_slot.volts_size + resp_slot.volts_size - 1)) {
         printf("Processing convolution...");
         clock_t time = clock();
         for (int i = 0; i < out_slot.volts_size; ++i) {
@@ -129,7 +130,7 @@ void algos::attenuate(int strength, MemoryData &in_slot, MemoryData &out_slot) {
     } else {
         mult = 1.0 - strength / 20.0;
     }
-    if(mem_man::mem_alloc(out_slot, in_slot.volts_size)) {
+    if (mem_man::mem_alloc(out_slot, in_slot.volts_size)) {
         for (int i = 0; i < in_slot.volts_size; ++i) {
             out_slot.volts[i] = in_slot.volts[i] * mult;
         }
@@ -146,5 +147,53 @@ void algos::cut_overflow_raw(float *data, size_t size) {
         } else if (data[i] > 10.0) {
             data[i] = 10.0;
         }
+    }
+}
+
+void algos::low_pass(double cutoff_freq, const int w_func, MemoryData &in_slot, MemoryData &out_slot,
+                     MemoryData &kernel_slot, MemoryFilter &filter_slot) {
+    if (mem_man::mem_alloc_taps(filter_slot, taps_size) &&
+        mem_man::mem_alloc(kernel_slot, taps_size)) {
+        wsfirLP(filter_slot.taps, taps_size, w_func, cutoff_freq);
+        conv_inp_side(in_slot,
+                      mem_man::mem_filter_to_data(filter_slot, kernel_slot), out_slot);
+    } else {
+        printf("%s failed to allocate memory\n", __func__);
+    }
+}
+
+void algos::high_pass(double cutoff_freq, const int w_func, MemoryData &in_slot, MemoryData &out_slot,
+                      MemoryData &kernel_slot, MemoryFilter &filter_slot) {
+    if (mem_man::mem_alloc_taps(filter_slot, taps_size) &&
+        mem_man::mem_alloc(kernel_slot, taps_size)) {
+        wsfirHP(filter_slot.taps, taps_size, w_func, cutoff_freq);
+        conv_inp_side(in_slot,
+                      mem_man::mem_filter_to_data(filter_slot, kernel_slot), out_slot);
+    } else {
+        printf("%s failed to allocate memory\n", __func__);
+    }
+}
+
+void algos::band_pass(double cutoff_lo, double cutoff_hi, const int w_func, MemoryData &in_slot, MemoryData &out_slot,
+                      MemoryData &kernel_slot, MemoryFilter &filter_slot) {
+    if (mem_man::mem_alloc_taps(filter_slot, taps_size) &&
+        mem_man::mem_alloc(kernel_slot, taps_size)) {
+        wsfirBP(filter_slot.taps, taps_size, w_func, cutoff_lo, cutoff_hi);
+        conv_inp_side(in_slot,
+                      mem_man::mem_filter_to_data(filter_slot, kernel_slot), out_slot);
+    } else {
+        printf("%s failed to allocate memory\n", __func__);
+    }
+}
+
+void algos::band_stop(double cutoff_lo, double cutoff_hi, const int w_func, MemoryData &in_slot, MemoryData &out_slot,
+                      MemoryData &kernel_slot, MemoryFilter &filter_slot) {
+    if (mem_man::mem_alloc_taps(filter_slot, taps_size) &&
+        mem_man::mem_alloc(kernel_slot, taps_size)) {
+        wsfirBS(filter_slot.taps, taps_size, w_func, cutoff_lo, cutoff_hi);
+        conv_inp_side(in_slot,
+                      mem_man::mem_filter_to_data(filter_slot, kernel_slot), out_slot);
+    } else {
+        printf("%s failed to allocate memory\n", __func__);
     }
 }

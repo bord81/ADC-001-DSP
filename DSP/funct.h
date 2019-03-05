@@ -92,6 +92,26 @@ public:
     void exec(int x) override;
 };
 
+class LowPass : public Funct {
+public:
+    void exec(int x) override;
+};
+
+class HighPass : public Funct {
+public:
+    void exec(int x) override;
+};
+
+class BandPass : public Funct {
+public:
+    void exec(int x) override;
+};
+
+class BandStop : public Funct {
+public:
+    void exec(int x) override;
+};
+
 #endif
 
 #endif // FUNCT_H

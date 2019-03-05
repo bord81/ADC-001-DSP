@@ -15,6 +15,10 @@ static char smp_dir_path_dat[PATH_LENGTH] = {0};
 static char smp_dir_path_wav[PATH_LENGTH] = {0};
 static const char *load_f = "Enter filename to load (w/o extension, max 20 chars): \n";
 static const char *save_f = "Enter filename to save (w/o extension, max 20 chars): \n";
+static const char *cutoff_fr = "Enter cut-off frequency (in range from 0 to %d): \n";
+static const char *cutoff_fr_lo = "Enter lower cut-off frequency (in range from 0 to %d): \n";
+static const char *cutoff_fr_hi = "Enter upper cut-off frequency (in range up to %d): \n";
+static const char *window_func = "Select window function (1 - Blackman, 2 - Hanning, 3 - Hamming)\n";
 static int duration;
 static mem_man *mm = new mem_man;
 static services *srv = new services;
@@ -110,5 +114,51 @@ void Amplify::exec(int x) {
 
 void Attenuate::exec(int x) {
     algos::attenuate(srv->choose_strength(), mm->get_slot(x), mm->get_slot(MEM_SLOT_3));
+    srv->display_main();
+}
+
+void LowPass::exec(int x) {
+    double cr = srv->choose_cutoff_freq(cutoff_fr, mm->get_slot(x).sample_rate);
+    int w_func = srv->choose_window_func(window_func);
+    algos::low_pass(cr, w_func, mm->get_slot(x), mm->get_slot(MEM_SLOT_3),
+                    mm->get_slot(MEM_SLOT_4), mm->get_filter(FILTER_SLOT_1));
+    srv->display_main();
+}
+
+void HighPass::exec(int x) {
+    double cr = srv->choose_cutoff_freq(cutoff_fr, mm->get_slot(x).sample_rate);
+    int w_func = srv->choose_window_func(window_func);
+    algos::high_pass(cr, w_func, mm->get_slot(x), mm->get_slot(MEM_SLOT_3),
+                     mm->get_slot(MEM_SLOT_4), mm->get_filter(FILTER_SLOT_1));
+    srv->display_main();
+}
+
+void BandPass::exec(int x) {
+    double cr_lo = srv->choose_cutoff_freq(cutoff_fr_lo, mm->get_slot(x).sample_rate);
+    double cr_hi;
+    for (;;) {
+        cr_hi = srv->choose_cutoff_freq(cutoff_fr_hi, mm->get_slot(x).sample_rate);
+        if (cr_hi > cr_lo) {
+            break;
+        }
+    }
+    int w_func = srv->choose_window_func(window_func);
+    algos::band_pass(cr_lo, cr_hi, w_func, mm->get_slot(x), mm->get_slot(MEM_SLOT_3),
+                     mm->get_slot(MEM_SLOT_4), mm->get_filter(FILTER_SLOT_1));
+    srv->display_main();
+}
+
+void BandStop::exec(int x) {
+    double cr_lo = srv->choose_cutoff_freq(cutoff_fr_lo, mm->get_slot(x).sample_rate);
+    double cr_hi;
+    for (;;) {
+        cr_hi = srv->choose_cutoff_freq(cutoff_fr_hi, mm->get_slot(x).sample_rate);
+        if (cr_hi > cr_lo) {
+            break;
+        }
+    }
+    int w_func = srv->choose_window_func(window_func);
+    algos::band_stop(cr_lo, cr_hi, w_func, mm->get_slot(x), mm->get_slot(MEM_SLOT_3),
+                     mm->get_slot(MEM_SLOT_4), mm->get_filter(FILTER_SLOT_1));
     srv->display_main();
 }

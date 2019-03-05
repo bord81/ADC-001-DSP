@@ -24,6 +24,10 @@ static ConvOutputSide conv_out_side;
 static DumpConv dump_conv;
 static Amplify amplify;
 static Attenuate attenuate;
+static LowPass low_pass;
+static HighPass high_pass;
+static BandPass band_pass;
+static BandStop band_stop;
 
 /* Main state machine table */
 static const State_Entry main_menu_entries[] =
@@ -62,11 +66,19 @@ static const State_Entry main_menu_entries[] =
                 {5, '2', 0, &hist_mean_and_std_dev, MEM_SLOT_1},
                 {5, '3', 0, &amplify,               MEM_SLOT_1},
                 {5, '4', 0, &attenuate,             MEM_SLOT_1},
+                {5, '5', 0, &low_pass,              MEM_SLOT_1},
+                {5, '6', 0, &high_pass,             MEM_SLOT_1},
+                {5, '7', 0, &band_pass,             MEM_SLOT_1},
+                {5, '8', 0, &band_stop,             MEM_SLOT_1},
                 {5, '0', 0, &main_menu,             0},
                 {6, '1', 0, &mean_and_std_dev,      MEM_SLOT_2},
                 {6, '2', 0, &hist_mean_and_std_dev, MEM_SLOT_2},
                 {6, '3', 0, &amplify,               MEM_SLOT_2},
                 {6, '4', 0, &attenuate,             MEM_SLOT_2},
+                {6, '5', 0, &low_pass,              MEM_SLOT_2},
+                {6, '6', 0, &high_pass,             MEM_SLOT_2},
+                {6, '7', 0, &band_pass,             MEM_SLOT_2},
+                {6, '8', 0, &band_stop,             MEM_SLOT_2},
                 {6, '0', 0, &main_menu,             0},
 
 
