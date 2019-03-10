@@ -34,6 +34,8 @@ public:
     band_stop(double cutoff_lo, double cutoff_hi, const int w_func, MemoryData &in_slot, MemoryData &out_slot,
               MemoryData &kernel_slot, MemoryFilter &filter_slot);
 
+    static void echo(int delay, float coef, MemoryData &in_slot, MemoryData &out_slot);
+
 private:
     static void cut_overflow_raw(float *data, size_t size);
 };

@@ -28,6 +28,7 @@ static LowPass low_pass;
 static HighPass high_pass;
 static BandPass band_pass;
 static BandStop band_stop;
+static Echo echo;
 
 /* Main state machine table */
 static const State_Entry main_menu_entries[] =
@@ -46,20 +47,20 @@ static const State_Entry main_menu_entries[] =
                 {1, '3', 2, &ch_samp_rate1,         DURATION_5},
                 {1, '4', 2, &ch_samp_rate1,         DURATION_10},
                 {1, '5', 0, &main_menu,             0},
-                {2, '1', 0, &set_samp_rate_run, SAMP_RATE_31250},
-                {2, '2', 0, &set_samp_rate_run, SAMP_RATE_15625},
-                {2, '3', 0, &set_samp_rate_run, SAMP_RATE_10417},
-                {2, '4', 0, &set_samp_rate_run, SAMP_RATE_5208},
-                {2, '5', 0, &set_samp_rate_run, SAMP_RATE_2604},
-                {2, '6', 0, &set_samp_rate_run, SAMP_RATE_1008},
-                {2, '7', 0, &set_samp_rate_run, SAMP_RATE_504},
-                {2, '8', 0, &set_samp_rate_run, SAMP_RATE_400P6},
-                {2, '9', 0, &set_samp_rate_run, SAMP_RATE_200P3},
+                {2, '1', 0, &set_samp_rate_run,     SAMP_RATE_31250},
+                {2, '2', 0, &set_samp_rate_run,     SAMP_RATE_15625},
+                {2, '3', 0, &set_samp_rate_run,     SAMP_RATE_10417},
+                {2, '4', 0, &set_samp_rate_run,     SAMP_RATE_5208},
+                {2, '5', 0, &set_samp_rate_run,     SAMP_RATE_2604},
+                {2, '6', 0, &set_samp_rate_run,     SAMP_RATE_1008},
+                {2, '7', 0, &set_samp_rate_run,     SAMP_RATE_504},
+                {2, '8', 0, &set_samp_rate_run,     SAMP_RATE_400P6},
+                {2, '9', 0, &set_samp_rate_run,     SAMP_RATE_200P3},
                 {2, 'n', 3, &ch_samp_rate2,         0},
                 {2, '0', 0, &main_menu,             0},
-                {3, '1', 0, &set_samp_rate_run, SAMP_RATE_100P2},
-                {3, '2', 0, &set_samp_rate_run, SAMP_RATE_59P98},
-                {3, '3', 0, &set_samp_rate_run, SAMP_RATE_50},
+                {3, '1', 0, &set_samp_rate_run,     SAMP_RATE_100P2},
+                {3, '2', 0, &set_samp_rate_run,     SAMP_RATE_59P98},
+                {3, '3', 0, &set_samp_rate_run,     SAMP_RATE_50},
                 {3, 'p', 2, &ch_samp_rate1,         0},
                 {3, '0', 0, &main_menu,             0},
                 {5, '1', 0, &mean_and_std_dev,      MEM_SLOT_1},
@@ -70,6 +71,7 @@ static const State_Entry main_menu_entries[] =
                 {5, '6', 0, &high_pass,             MEM_SLOT_1},
                 {5, '7', 0, &band_pass,             MEM_SLOT_1},
                 {5, '8', 0, &band_stop,             MEM_SLOT_1},
+                {5, '9', 0, &echo,                  MEM_SLOT_1},
                 {5, '0', 0, &main_menu,             0},
                 {6, '1', 0, &mean_and_std_dev,      MEM_SLOT_2},
                 {6, '2', 0, &hist_mean_and_std_dev, MEM_SLOT_2},
@@ -79,6 +81,7 @@ static const State_Entry main_menu_entries[] =
                 {6, '6', 0, &high_pass,             MEM_SLOT_2},
                 {6, '7', 0, &band_pass,             MEM_SLOT_2},
                 {6, '8', 0, &band_stop,             MEM_SLOT_2},
+                {6, '9', 0, &echo,                  MEM_SLOT_2},
                 {6, '0', 0, &main_menu,             0},
 
 

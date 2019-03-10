@@ -5,7 +5,6 @@
 #include "plot.h"
 #include "algos.h"
 
-
 void algos::mean_stddev(MemoryData &slot) {
     float mean = 0.0;
     float var = 0.0;
@@ -79,6 +78,7 @@ void algos::conv_inp_side(MemoryData &in_slot, MemoryData &resp_slot, MemoryData
                 out_slot.volts[i + j] = out_slot.volts[i + j] + in_slot.volts[i] * resp_slot.volts[j];
             }
         }
+
         time = clock() - time;
         printf("took %lu ticks\n", time);
         cut_overflow_raw(out_slot.volts, out_slot.volts_size);
@@ -193,6 +193,17 @@ void algos::band_stop(double cutoff_lo, double cutoff_hi, const int w_func, Memo
         wsfirBS(filter_slot.taps, taps_size, w_func, cutoff_lo, cutoff_hi);
         conv_inp_side(in_slot,
                       mem_man::mem_filter_to_data(filter_slot, kernel_slot), out_slot);
+    } else {
+        printf("%s failed to allocate memory\n", __func__);
+    }
+}
+
+void algos::echo(int delay, float coef, MemoryData &in_slot, MemoryData &out_slot) {
+    if (mem_man::mem_alloc(out_slot, in_slot.volts_size + delay)) {
+        for (int i = 0; i < in_slot.volts_size; ++i) {
+            out_slot.volts[i] += in_slot.volts[i];
+            out_slot.volts[i + delay] += in_slot.volts[i] * coef;
+        }
     } else {
         printf("%s failed to allocate memory\n", __func__);
     }

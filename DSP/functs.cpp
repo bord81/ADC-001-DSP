@@ -162,3 +162,9 @@ void BandStop::exec(int x) {
                      mm->get_slot(MEM_SLOT_4), mm->get_filter(FILTER_SLOT_1));
     srv->display_main();
 }
+
+void Echo::exec(int x) {
+    algos::echo(srv->get_real_samp_rate(mm->get_slot(x).sample_rate) / 2, 0.5,
+            mm->get_slot(x), mm->get_slot(MEM_SLOT_3));
+    srv->display_main();
+}

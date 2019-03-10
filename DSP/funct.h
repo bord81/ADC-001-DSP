@@ -112,6 +112,11 @@ public:
     void exec(int x) override;
 };
 
+class Echo : public Funct {
+public:
+    void exec(int x) override;
+};
+
 #endif
 
 #endif // FUNCT_H

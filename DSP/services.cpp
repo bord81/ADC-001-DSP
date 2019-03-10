@@ -217,6 +217,7 @@ void services::display_algos() {
     printf("'6' High-pass filter\n");
     printf("'7' Band-pass filter\n");
     printf("'8' Band-stop filter\n");
+    printf("'9' Echo filter\n");
     printf("'0' back to main menu\n");
 }
 
