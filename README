@@ -7,8 +7,6 @@ This repo is about playing around with ADC-001 A/D cape using Beaglebone Black R
 main.o - original tests of ADC cape
 dsp_examples - program to record and analyze audio samples
 
-More functionality and filters will be added soon!
-
 Installation tips: 
 
 1. the correct way to disable HDMI is to uncomment the following line in /boot/uEnv.txt
