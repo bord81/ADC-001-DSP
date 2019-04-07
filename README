@@ -14,3 +14,6 @@ disable_uboot_overlay_video=1
 
 2. add following line to /etc/environment to enable correct work of gnuplot
 export DISPLAY=:0
+
+
+You can also use https://github.com/bord81/DSP_lib_common to work with recorded .dat files on a more powerful machine.
